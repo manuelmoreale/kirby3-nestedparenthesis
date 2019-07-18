@@ -7,31 +7,13 @@ return [
     'kirbytags:before' => function ($text, array $data = [], array $options = []) {
 
         # @rasteiner come up with this monster right here, don't blame me if your server explodes
-        $regex = '/\(\s*(\w+?):\s*?\w+?\s*?(?:\w+?:(?\'rec\'[:;]-?[\(\)]|[^)(]+?|\((?&rec)*?\))*?)*?\)/mx';
+        $regex = '/\((?:\w+:\s*(?\'rec\'(?>[^)(:\s]+)\s*|[:;]-?[)(]\s*|\(\s*(?&rec)*?\)\s*)+)+?\)/mx';
 
         # KirbyTags have not been parsed at this point
         $text = preg_replace_callback($regex, function ($matches) {
             
-            # Loop through each tag and perform a replace
-            foreach ($matches as $match) :
-
-                # First trim the () at the beginning and at the end of the tag,
-                # because we want to keep those
-                $match = substr($match , 1 , -1);
-
-                # Then look for () inside the string and replace them with another character
-                $match = str_replace(['(',')'] , ['⎣','⎦'] , $match);
-
-                # Add back the two () at the beginning and the end
-                $match = "({$match})";
-
-                # Return the string
-                return $match;
-
-            endforeach;
-
-            # Return al the kirbytags
-            return $matches;
+            # Return the string with swapped characters
+            return '(' . str_replace(['(',')'] , ['⎣','⎦'] , substr($matches[0],1,-1)) . ')';
 
         }, $text);
 
